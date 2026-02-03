@@ -5,10 +5,23 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.actuator       = new Actuator;
 
   this.startTiles     = 2;
+  
+  // Game mode and features
+  this.gameMode       = this.storageManager.getGameMode() || 'standard';
+  this.moveHistory    = []; // For undo functionality
+  this.maxHistorySize = 20;
+  
+  // Powerups
+  this.powerups = {
+    shuffle: 3,
+    remove: 2,
+    undo: 5
+  };
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
+  this.inputManager.on("undo", this.undo.bind(this));
 
   this.setup();
 }
@@ -17,7 +30,66 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 GameManager.prototype.restart = function () {
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
+  this.moveHistory = [];
+  
+  // Reset powerups based on game mode
+  if (this.gameMode === 'standard') {
+    this.powerups = { shuffle: 3, remove: 2, undo: 5 };
+  } else if (this.gameMode === 'plus') {
+    this.powerups = { shuffle: 5, remove: 4, undo: 10 };
+  } else {
+    this.powerups = { shuffle: 0, remove: 0, undo: 0 };
+  }
+  
   this.setup();
+};
+
+// Set game mode
+GameManager.prototype.setGameMode = function (mode) {
+  this.gameMode = mode;
+  this.storageManager.setGameMode(mode);
+  this.restart();
+};
+
+// Undo last move
+GameManager.prototype.undo = function () {
+  if (this.gameMode === 'classic') {
+    return; // No undo in classic mode
+  }
+  
+  if (this.moveHistory.length === 0) {
+    return;
+  }
+  
+  var previousState = this.moveHistory.pop();
+  this.grid = new Grid(previousState.grid.size, previousState.grid.cells);
+  this.score = previousState.score;
+  this.over = previousState.over;
+  this.won = previousState.won;
+  
+  this.actuate();
+};
+
+// Save current state for undo
+GameManager.prototype.saveState = function () {
+  if (this.gameMode === 'classic') {
+    return; // Don't save history in classic mode
+  }
+  
+  this.moveHistory.push({
+    grid: {
+      size: this.grid.size,
+      cells: this.grid.serialize().cells
+    },
+    score: this.score,
+    over: this.over,
+    won: this.won
+  });
+  
+  // Limit history size
+  if (this.moveHistory.length > this.maxHistorySize) {
+    this.moveHistory.shift();
+  }
 };
 
 // Keep playing after winning (allows going over 2048)
@@ -138,6 +210,9 @@ GameManager.prototype.move = function (direction) {
   var vector     = this.getVector(direction);
   var traversals = this.buildTraversals(vector);
   var moved      = false;
+
+  // Save state for undo before making the move
+  this.saveState();
 
   // Save the current tile positions and remove merger information
   this.prepareTiles();
@@ -269,4 +344,75 @@ GameManager.prototype.tileMatchesAvailable = function () {
 
 GameManager.prototype.positionsEqual = function (first, second) {
   return first.x === second.x && first.y === second.y;
+};
+
+// Powerup: Shuffle tiles
+GameManager.prototype.shuffleTiles = function () {
+  if (this.powerups.shuffle <= 0 || this.gameMode === 'classic') return false;
+  
+  var tiles = [];
+  var positions = [];
+  
+  // Collect all tiles and positions
+  this.grid.eachCell(function (x, y, tile) {
+    if (tile) {
+      tiles.push(tile.value);
+      positions.push({ x: x, y: y });
+    }
+  });
+  
+  if (tiles.length === 0) return false;
+  
+  // Shuffle tiles array
+  for (var i = tiles.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = tiles[i];
+    tiles[i] = tiles[j];
+    tiles[j] = temp;
+  }
+  
+  // Clear grid and place shuffled tiles
+  this.grid.cells = this.grid.empty();
+  for (var k = 0; k < positions.length; k++) {
+    var tile = new Tile(positions[k], tiles[k]);
+    this.grid.insertTile(tile);
+  }
+  
+  this.powerups.shuffle--;
+  this.actuate();
+  return true;
+};
+
+// Powerup: Remove a tile
+GameManager.prototype.removeTile = function () {
+  if (this.powerups.remove <= 0 || this.gameMode === 'classic') return false;
+  
+  var tiles = [];
+  
+  // Collect all tiles
+  this.grid.eachCell(function (x, y, tile) {
+    if (tile) {
+      tiles.push(tile);
+    }
+  });
+  
+  if (tiles.length === 0) return false;
+  
+  // Remove a random tile (prefer lower value tiles)
+  tiles.sort(function(a, b) { return a.value - b.value; });
+  var tileToRemove = tiles[Math.floor(Math.random() * Math.min(tiles.length, 3))];
+  
+  this.grid.removeTile(tileToRemove);
+  this.powerups.remove--;
+  this.actuate();
+  return true;
+};
+
+// Powerup: Undo using powerup
+GameManager.prototype.usePowerupUndo = function () {
+  if (this.powerups.undo <= 0 || this.gameMode === 'classic') return false;
+  
+  this.powerups.undo--;
+  this.undo();
+  return true;
 };

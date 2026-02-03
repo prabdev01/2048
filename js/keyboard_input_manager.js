@@ -66,6 +66,12 @@ KeyboardInputManager.prototype.listen = function () {
     if (!modifiers && event.which === 82) {
       self.restart.call(self, event);
     }
+    
+    // U key or Ctrl+Z for undo
+    if ((!modifiers && event.which === 85) || (event.ctrlKey && event.which === 90)) {
+      event.preventDefault();
+      self.emit("undo");
+    }
   });
 
   // Respond to button presses

@@ -17,8 +17,73 @@
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 <body>
+  <!-- Game Mode Menu Overlay -->
+  <div class="menu-overlay" id="menuOverlay">
+    <div class="menu-container">
+      <div class="menu-header">
+        <button class="hamburger-button" id="menuClose">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <h2 class="menu-title">2048</h2>
+      </div>
+      
+      <div class="menu-modes">
+        <div class="mode-item active" data-mode="standard">
+          <div class="mode-icon">⭐</div>
+          <div class="mode-content">
+            <h3>Standard</h3>
+            <p>2048 with powerups</p>
+          </div>
+        </div>
+        
+        <div class="mode-item" data-mode="classic">
+          <div class="mode-icon">🎯</div>
+          <div class="mode-content">
+            <h3>Classic</h3>
+            <p>The original 2048, no undo</p>
+          </div>
+        </div>
+        
+        <div class="mode-item" data-mode="tutorial">
+          <div class="mode-icon">🎓</div>
+          <div class="mode-content">
+            <h3>Tutorial</h3>
+            <p>Learn how to play 2048</p>
+          </div>
+        </div>
+        
+        <div class="mode-item" data-mode="plus">
+          <div class="mode-icon">👑</div>
+          <div class="mode-content">
+            <h3>Plus</h3>
+            <p>Bonus powerups and dark board!</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="menu-links">
+        <a href="#" class="menu-link">Give Feedback</a>
+        <a href="#" class="menu-link">Get the App</a>
+        <a href="#" class="menu-link">Privacy Policy</a>
+        <a href="#" class="menu-link">Privacy Settings</a>
+        <a href="#" class="menu-link">About</a>
+        <a href="#" class="menu-link">Game not working?</a>
+        <a href="#" class="menu-link">Play Solitaire</a>
+        <a href="#" class="menu-link">Play Card Games</a>
+        <a href="http://gabrielecirulli.github.io/2048/" class="menu-link-highlight">Go to the old 2048 →</a>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
     <div class="heading">
+      <button class="hamburger-button" id="menuButton">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       <h1 class="title">2048</h1>
       <div class="scores-container">
         <div class="score-container">0</div>
@@ -28,7 +93,41 @@
 
     <div class="above-game">
       <p class="game-intro">Join the numbers and get to the <strong>2048 tile!</strong></p>
-      <a class="restart-button">New Game</a>
+      <div class="game-controls">
+        <a class="restart-button">New Game</a>
+        <button class="undo-button" id="undoButton">↶ Undo</button>
+      </div>
+    </div>
+    
+    <!-- Powerups Panel -->
+    <div class="powerups-panel" id="powerupsPanel" style="display: none;">
+      <h3>Powerups</h3>
+      <div class="powerups-container">
+        <button class="powerup-button" id="shufflePowerup" data-powerup="shuffle">
+          <span class="powerup-icon">🔀</span>
+          <span class="powerup-name">Shuffle</span>
+          <span class="powerup-count">3</span>
+        </button>
+        <button class="powerup-button" id="removePowerup" data-powerup="remove">
+          <span class="powerup-icon">🗑️</span>
+          <span class="powerup-name">Remove Tile</span>
+          <span class="powerup-count">2</span>
+        </button>
+        <button class="powerup-button" id="undoPowerup" data-powerup="undo">
+          <span class="powerup-icon">↶</span>
+          <span class="powerup-name">Undo Move</span>
+          <span class="powerup-count">5</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Tutorial Overlay -->
+    <div class="tutorial-overlay" id="tutorialOverlay" style="display: none;">
+      <div class="tutorial-content">
+        <h3 id="tutorialTitle">Welcome to 2048!</h3>
+        <p id="tutorialText">Use arrow keys to move tiles. When two tiles with the same number touch, they merge into one!</p>
+        <button class="tutorial-button" id="tutorialNext">Next</button>
+      </div>
     </div>
 
     <div class="game-container">
@@ -77,12 +176,20 @@
     </p>
     <hr>
     <p>
-    <strong class="important">Note:</strong> This site is the official version of 2048. You can play it on your phone via <a href="http://git.io/2048">http://git.io/2048.</a> All other apps or sites are derivatives or fakes, and should be used with caution.
+    <strong class="important">Note:</strong> This is an enhanced version of 2048 with multiple game modes and powerups. Original game created by <a href="http://gabrielecirulli.com" target="_blank">Gabriele Cirulli.</a>
     </p>
     <hr>
-    <p>
-    Created by <a href="http://gabrielecirulli.com" target="_blank">Gabriele Cirulli.</a> Based on <a href="https://itunes.apple.com/us/app/1024!/id823499224" target="_blank">1024 by Veewo Studio</a> and conceptually similar to <a href="http://asherv.com/threes/" target="_blank">Threes by Asher Vollmer.</a>
-    </p>
+    <div class="footer-links">
+      <p>
+        Based on <a href="https://itunes.apple.com/us/app/1024!/id823499224" target="_blank">1024 by Veewo Studio</a> and conceptually similar to <a href="http://asherv.com/threes/" target="_blank">Threes by Asher Vollmer.</a>
+      </p>
+      <div class="theme-toggle">
+        <label>
+          <input type="checkbox" id="darkThemeToggle">
+          <span>Dark Theme</span>
+        </label>
+      </div>
+    </div>
   </div>
 
   <script src="js/bind_polyfill.js"></script>
@@ -94,6 +201,7 @@
   <script src="js/tile.js"></script>
   <script src="js/local_storage_manager.js"></script>
   <script src="js/game_manager.js"></script>
+  <script src="js/ui_manager.js"></script>
   <script src="js/application.js"></script>
 </body>
 </html>

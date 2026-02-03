@@ -21,6 +21,7 @@ window.fakeStorage = {
 function LocalStorageManager() {
   this.bestScoreKey     = "bestScore";
   this.gameStateKey     = "gameState";
+  this.gameModeKey      = "gameMode";
 
   var supported = this.localStorageSupported();
   this.storage = supported ? window.localStorage : window.fakeStorage;
@@ -60,4 +61,13 @@ LocalStorageManager.prototype.setGameState = function (gameState) {
 
 LocalStorageManager.prototype.clearGameState = function () {
   this.storage.removeItem(this.gameStateKey);
+};
+
+// Game mode getters/setters
+LocalStorageManager.prototype.getGameMode = function () {
+  return this.storage.getItem(this.gameModeKey) || 'standard';
+};
+
+LocalStorageManager.prototype.setGameMode = function (mode) {
+  this.storage.setItem(this.gameModeKey, mode);
 };
