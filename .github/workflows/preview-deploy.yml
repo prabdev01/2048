@@ -1,0 +1,60 @@
+name: Deploy PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - master
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build web app
+        run: npm run web:build
+        env:
+          PUBLIC_URL: /2048/pr-${{ github.event.pull_request.number }}
+      
+      - name: Deploy to Vercel Preview
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          github-comment: true
+          alias-domains: |
+            pr-${{ github.event.pull_request.number }}-2048.vercel.app
+      
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const previewUrl = `https://pr-${prNumber}-2048.vercel.app`;
+            
+            github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🚀 Preview Deployment Ready!\n\n` +
+                    `Your changes are live at: **[${previewUrl}](${previewUrl})**\n\n` +
+                    `### What to test:\n` +
+                    `- ✅ Game functionality\n` +
+                    `- ✅ Touch/Mouse controls\n` +
+                    `- ✅ All themes\n` +
+                    `- ✅ Responsive design\n` +
+                    `- ✅ PWA features\n\n` +
+                    `*This preview will update automatically with new commits.*`
+            });

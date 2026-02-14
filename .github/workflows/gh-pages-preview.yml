@@ -1,0 +1,46 @@
+name: GitHub Pages PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install and Build
+        run: |
+          npm ci
+          npm run web:build
+      
+      - name: Deploy to gh-pages preview
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          destination_dir: pr-${{ github.event.pull_request.number }}
+      
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const previewUrl = `https://prabdev01.github.io/2048/pr-${prNumber}/`;
+            
+            github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 📱 Preview Deployed!\n\n` +
+                    `🔗 **Live Preview:** [${previewUrl}](${previewUrl})\n\n` +
+                    `Test your changes before merging!\n\n` +
+                    `*Preview updates automatically with each commit.*`
+            });

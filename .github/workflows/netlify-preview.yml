@@ -1,0 +1,46 @@
+name: Netlify Preview Deploy
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install and Build
+        run: |
+          npm ci
+          npm run web:build
+      
+      - name: Deploy to Netlify
+        uses: netlify/actions/cli@master
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        with:
+          args: deploy --dir=dist --functions=functions --alias=pr-${{ github.event.pull_request.number }}
+      
+      - name: Post comment with preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const deployUrl = `https://pr-${prNumber}--2048-game.netlify.app`;
+            
+            await github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🎮 Live Preview Deployed!\n\n` +
+                    `**Preview URL:** ${deployUrl}\n\n` +
+                    `Test the game directly in your browser before merging!`
+            });

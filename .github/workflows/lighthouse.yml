@@ -1,0 +1,47 @@
+name: Lighthouse CI
+
+on: 
+  pull_request:
+    branches: [master]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run web:build
+      
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            http://localhost:8080
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+      
+      - name: Comment PR with Lighthouse results
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            
+            await github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 📊 Lighthouse CI Results\n\n` +
+                    `Performance, accessibility, and SEO scores have been analyzed.\n\n` +
+                    `Check the workflow artifacts for detailed reports.`
+            });
