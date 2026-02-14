@@ -1,0 +1,11 @@
+rootProject.name = 'ReactNative2048'
+
+// Load React Native settings if they exist
+def rnSettingsGradle = file("../node_modules/@react-native/gradle-plugin/settings.gradle")
+if (rnSettingsGradle.exists()) {
+    apply from: rnSettingsGradle
+}
+includeBuild('../node_modules/@react-native/gradle-plugin')
+
+include ':app'
+
