@@ -27,9 +27,10 @@
 - **Build settings:**
   - Framework preset: **None**
   - Build command: `npm run web:build`
-  - Build output directory: `dist` (default) **OR** `web-build` (requires environment variable `OUTPUT_DIR=web-build`)
-  - If using `web-build`, add environment variable: `OUTPUT_DIR=web-build` in environment variables section
+  - Build output directory: `dist` (this is the default output directory)
 - Click **Save and Deploy**
+
+> **Note:** The GitHub Actions workflow uses `web-build` output directory with the `OUTPUT_DIR` environment variable. Cloudflare Pages doesn't need this - it uses the default `dist` directory.
 
 ### 3. Get Cloudflare API Token
 - Go to Cloudflare Dashboard → My Profile → API Tokens

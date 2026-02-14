@@ -25,8 +25,10 @@
 - Select `prabdev01/2048` repository
 - Framework Preset: **Other**
 - Build Command: `npm run web:build`
-- Output Directory: `dist` (default) **OR** `web-build` (requires environment variable `OUTPUT_DIR=web-build`)
+- Output Directory: `dist` (this is the default output directory)
 - Click **Deploy**
+
+> **Note:** The GitHub Actions workflow uses `web-build` output directory with the `OUTPUT_DIR` environment variable. Vercel doesn't need this - it uses the default `dist` directory.
 
 ### 3. Get Vercel Tokens
 - Go to Vercel Dashboard → Settings → Tokens
