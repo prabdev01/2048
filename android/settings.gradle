@@ -1,9 +1,11 @@
 rootProject.name = 'ReactNative2048'
-apply from: file("../node_modules/@react-native/gradle-plugin/settings.gradle")
+
+// Load React Native settings if they exist
+def rnSettingsGradle = file("../node_modules/@react-native/gradle-plugin/settings.gradle")
+if (rnSettingsGradle.exists()) {
+    apply from: rnSettingsGradle
+}
 includeBuild('../node_modules/@react-native/gradle-plugin')
 
 include ':app'
-includeBuild('../node_modules/react-native-gradle-plugin')
 
-apply from: new File(["node", "--print", "require.resolve('expo/package.json')"].execute(null, rootDir).text.trim(), "../scripts/autolinking.gradle")
-useExpoModules()

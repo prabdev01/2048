@@ -5,6 +5,9 @@
   "main": "index.js",
   "scripts": {
     "android": "react-native run-android",
+    "android:build": "cd android && ./gradlew assembleRelease",
+    "android:build-debug": "cd android && ./gradlew assembleDebug",
+    "android:clean": "cd android && ./gradlew clean",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "web": "webpack serve --mode development",
