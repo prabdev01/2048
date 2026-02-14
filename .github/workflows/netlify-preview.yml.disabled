@@ -1,0 +1,39 @@
+# TO ENABLE: Rename this file to netlify-preview.yml and add secrets
+# Required Secrets: NETLIFY_AUTH_TOKEN, NETLIFY_SITE_ID
+# See docs/MIGRATE_TO_NETLIFY.md for setup instructions
+
+name: Netlify Preview Deploy
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install and Build
+        run: |
+          npm ci
+          npm run web:build
+        env:
+          OUTPUT_DIR: web-build
+      
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2.1
+        with:
+          publish-dir: './web-build'
+          production-deploy: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from PR #${{ github.event.pull_request.number }}"
+          alias: pr-${{ github.event.pull_request.number }}
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
