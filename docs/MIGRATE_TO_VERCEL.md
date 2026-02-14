@@ -25,7 +25,7 @@
 - Select `prabdev01/2048` repository
 - Framework Preset: **Other**
 - Build Command: `npm run web:build`
-- Output Directory: `web-build`
+- Output Directory: `dist` (or set `web-build` and add environment variable `OUTPUT_DIR=web-build`)
 - Click **Deploy**
 
 ### 3. Get Vercel Tokens

@@ -27,8 +27,8 @@
 - **Build settings:**
   - Framework preset: **None**
   - Build command: `npm run web:build`
-  - Build output directory: `web-build`
-  - Add environment variable: `OUTPUT_DIR=web-build`
+  - Build output directory: `dist` (default) or `web-build` with environment variable below
+  - **Advanced:** Add environment variable: `OUTPUT_DIR=web-build` (optional, if using web-build)
 - Click **Save and Deploy**
 
 ### 3. Get Cloudflare API Token
