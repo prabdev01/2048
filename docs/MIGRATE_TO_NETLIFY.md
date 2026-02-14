@@ -26,8 +26,8 @@
 - Choose `prabdev01/2048` repository
 - **Build settings:**
   - Build command: `npm run web:build`
-  - Publish directory: `dist` (default) or `web-build` with environment variable below
-  - **Advanced:** Add environment variable: `OUTPUT_DIR=web-build` (optional, if using web-build)
+  - Publish directory: `dist` (default) **OR** `web-build` (requires environment variable `OUTPUT_DIR=web-build`)
+  - If using `web-build`, add environment variable: `OUTPUT_DIR=web-build` in advanced settings
 - Click **Deploy site**
 
 ### 3. Get Netlify Tokens
