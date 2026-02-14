@@ -1,0 +1,53 @@
+{
+  "name": "2048-game",
+  "version": "1.0.0",
+  "description": "A small clone of 1024 - join the numbers and get to the 2048 tile!",
+  "main": "src/index.js",
+  "scripts": {
+    "web": "webpack serve --mode development --open",
+    "web:dev": "webpack serve --mode development --hot",
+    "web:build": "webpack --mode production",
+    "web:serve": "npx serve -s dist",
+    "web:analyze": "webpack-bundle-analyzer dist/stats.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prabdev01/2048.git"
+  },
+  "keywords": [
+    "2048",
+    "game",
+    "puzzle",
+    "tile",
+    "merge"
+  ],
+  "author": "Gabriele Cirulli",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/prabdev01/2048/issues"
+  },
+  "homepage": "https://github.com/prabdev01/2048#readme",
+  "dependencies": {
+    "core-js": "^3.35.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.9",
+    "@babel/preset-env": "^7.23.9",
+    "babel-loader": "^9.1.3",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.10.0",
+    "css-minimizer-webpack-plugin": "^5.0.1",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.6.0",
+    "mini-css-extract-plugin": "^2.7.6",
+    "style-loader": "^3.3.4",
+    "terser-webpack-plugin": "^5.3.10",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.90.0",
+    "webpack-bundle-analyzer": "^4.10.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4",
+    "workbox-webpack-plugin": "^7.0.0"
+  }
+}
