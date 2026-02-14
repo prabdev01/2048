@@ -27,10 +27,10 @@
 - **Build settings:**
   - Framework preset: **None**
   - Build command: `npm run web:build`
-  - Build output directory: `dist` (this is the default output directory)
+  - Build output directory: `dist`
 - Click **Save and Deploy**
 
-> **Note:** The GitHub Actions workflow uses `web-build` output directory with the `OUTPUT_DIR` environment variable. Cloudflare Pages doesn't need this - it uses the default `dist` directory.
+> **Note:** If you're using the provided GitHub Actions workflow (`.github/workflows/cloudflare-preview.yml`), it builds and deploys via GitHub Actions, so the Cloudflare Pages UI build settings won't be used.
 
 ### 3. Get Cloudflare API Token
 - Go to Cloudflare Dashboard → My Profile → API Tokens

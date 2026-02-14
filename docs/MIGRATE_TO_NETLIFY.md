@@ -26,10 +26,10 @@
 - Choose `prabdev01/2048` repository
 - **Build settings:**
   - Build command: `npm run web:build`
-  - Publish directory: `dist` (this is the default output directory)
+  - Publish directory: `dist`
 - Click **Deploy site**
 
-> **Note:** The GitHub Actions workflow uses `web-build` output directory with the `OUTPUT_DIR` environment variable. Netlify doesn't need this - it uses the default `dist` directory.
+> **Note:** If you're using the provided GitHub Actions workflow (`.github/workflows/netlify-preview.yml`), it builds and deploys via GitHub Actions, so the Netlify UI build settings won't be used.
 
 ### 3. Get Netlify Tokens
 - Go to User Settings → Applications → Personal Access Tokens
