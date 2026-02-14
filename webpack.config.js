@@ -9,15 +9,16 @@ const WorkboxPlugin = require('workbox-webpack-plugin');
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
-  const publicUrl = process.env.PUBLIC_URL || '/';
+  const outputDir = process.env.OUTPUT_DIR || 'dist';
+  const publicPath = process.env.PUBLIC_URL || '/';
   
   return {
     entry: './src/index.js',
     output: {
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(__dirname, outputDir),
       filename: isProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/bundle.js',
       chunkFilename: isProduction ? 'static/js/[name].[contenthash:8].chunk.js' : 'static/js/[name].chunk.js',
-      publicPath: publicUrl,
+      publicPath: publicPath,
       clean: true,
     },
     mode: argv.mode || 'development',

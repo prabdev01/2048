@@ -1,28 +1,29 @@
-name: Cleanup Closed PR Previews
+name: Cleanup PR Previews
 
 on:
   pull_request:
     types: [closed]
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
-      - name: Checkout repository
+      - name: Checkout gh-pages branch
         uses: actions/checkout@v4
         with:
           ref: gh-pages
       
-      - name: Remove preview directory
+      - name: Remove PR preview directory
         run: |
           rm -rf pr-${{ github.event.pull_request.number }}
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
           git add .
-          git diff --quiet && git diff --staged --quiet || git commit -m "Cleanup preview for PR #${{ github.event.pull_request.number }}"
+          git commit -m "Clean up preview for PR #${{ github.event.pull_request.number }}" || exit 0
           git push
       
       - name: Comment on PR
@@ -30,8 +31,8 @@ jobs:
         with:
           script: |
             github.rest.issues.createComment({
-              issue_number: context.payload.pull_request.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `Preview deployment has been cleaned up. ✨`
+              issue_number: context.payload.pull_request.number,
+              body: `🧹 Preview deployment has been cleaned up.`
             });
