@@ -1,0 +1,101 @@
+name: GitHub Pages PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - master
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build web app
+        run: npm run web:build
+        env:
+          OUTPUT_DIR: web-build
+          PUBLIC_URL: /2048/pr-${{ github.event.pull_request.number }}
+      
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web-build
+          destination_dir: pr-${{ github.event.pull_request.number }}
+          keep_files: true
+          enable_jekyll: false
+          cname: false
+      
+      - name: Comment on PR with preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const previewUrl = `https://prabdev01.github.io/2048/pr-${prNumber}/`;
+            
+            // Find existing comment
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            
+            const botComment = comments.data.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Preview Deployment')
+            );
+            
+            const commentBody = `## 🚀 GitHub Pages Preview Deployed!\n\n` +
+              `🔗 **Live Preview:** [${previewUrl}](${previewUrl})\n\n` +
+              `### 📱 Test your changes:\n` +
+              `- ✅ Full 2048 game functionality\n` +
+              `- ✅ Touch/Mouse/Keyboard controls\n` +
+              `- ✅ All 7 themes working\n` +
+              `- ✅ Responsive design (mobile/tablet/desktop)\n` +
+              `- ✅ PWA features\n` +
+              `- ✅ Score persistence\n\n` +
+              `*✨ This preview updates automatically with each commit.*\n\n` +
+              `---\n` +
+              `**Deployment:** GitHub Pages (free) | **Status:** ✅ Live\n` +
+              `*Want faster deployments? Check \`docs/MIGRATE_TO_VERCEL.md\`*`;
+            
+            if (botComment) {
+              github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: commentBody
+              });
+            }
+      
+      - name: Add deployment status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const previewUrl = `https://prabdev01.github.io/2048/pr-${prNumber}/`;
+            
+            core.notice(`Preview deployed: ${previewUrl}`);

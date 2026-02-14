@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "buildCommand": "npm run web:build",
+  "outputDirectory": "dist",
+  "framework": null,
+  "installCommand": "npm ci",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}
